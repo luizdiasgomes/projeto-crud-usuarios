@@ -1,6 +1,4 @@
-
 services:
-
   postgres:
     image: postgres:15
     container_name: postgres_db
@@ -10,3 +8,34 @@ services:
       POSTGRES_PASSWORD: 123456
     ports:
       - "5433:5432"
+    networks:
+      - crud-network
+
+  backend:
+    build: ./backend/crud-usuarios
+    container_name: spring_backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/crud_usuario
+      SPRING_DATASOURCE_USERNAME: crud_user
+      SPRING_DATASOURCE_PASSWORD: 123456
+    depends_on:
+      - postgres
+    networks:
+      - crud-network
+
+  frontend:
+    build: ./frontend/crud-usuarios
+    container_name: react_frontend
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    depends_on:
+      - backend
+    networks:
+      - crud-network
+
+networks:
+  crud-network:
+    driver: bridge

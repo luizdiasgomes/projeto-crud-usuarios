@@ -1,9 +1,11 @@
 package com.projeto.crudusuarios.usuario;
 
 import com.projeto.crudusuarios.exception.ApiException;
+import com.projeto.crudusuarios.usuario.entity.UsuarioEntity;
 import com.seuprojeto.model.Usuario;
 import com.seuprojeto.model.UsuarioRequest;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.List;
 public class UsuarioService {
 
     private final UsuarioRepository repository;
+    private final ModelMapper mapper;
 
     /**
      * Retorna a lista de todos os usuários cadastrados.
@@ -21,7 +24,9 @@ public class UsuarioService {
      * @return Lista de usuários
      */
     public List<Usuario> listar() {
-        return repository.findAll();
+        return repository.findAll().stream()
+                .map(entity -> mapper.map(entity, Usuario.class))
+                .toList();
     }
 
     /**
@@ -32,8 +37,9 @@ public class UsuarioService {
      * @throws ApiException caso o usuário não exista
      */
     public Usuario buscarPorId(Long id) {
-        return repository.findById(id)
+        UsuarioEntity entity = repository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+        return mapper.map(entity, Usuario.class);
     }
 
     /**
@@ -43,10 +49,11 @@ public class UsuarioService {
      * @return Usuário criado
      */
     public Usuario criar(UsuarioRequest request) {
-        Usuario usuario = new Usuario();
-        usuario.setNome(request.getNome());
-        usuario.setEmail(request.getEmail());
-        return repository.save(usuario);
+        UsuarioEntity entity = mapper.map(request, UsuarioEntity.class);
+
+        UsuarioEntity salvo = repository.save(entity);
+
+        return mapper.map(salvo, Usuario.class);
     }
 
     /**
@@ -57,10 +64,13 @@ public class UsuarioService {
      * @return Usuário atualizado
      */
     public Usuario atualizar(Long id, UsuarioRequest request) {
-        Usuario usuario = buscarPorId(id);
-        usuario.setNome(request.getNome());
-        usuario.setEmail(request.getEmail());
-        return repository.save(usuario);
+        var entityExistente = repository.findById(id)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+
+        mapper.map(request, entityExistente);
+
+        UsuarioEntity atualizado = repository.save(entityExistente);
+        return mapper.map(atualizado, Usuario.class);
     }
 
     /**
@@ -69,6 +79,9 @@ public class UsuarioService {
      * @param id ID do usuário a ser removido
      */
     public void deletar(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
+        }
         repository.deleteById(id);
     }
 }
