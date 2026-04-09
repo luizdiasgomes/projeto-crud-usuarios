@@ -1,0 +1,109 @@
+openapi: 3.0.0
+info:
+  title: API Usuários
+  version: 1.0.0
+
+tags:
+  - name: 'Usuarios'
+    description: Operações de Usuário
+
+paths:
+  /usuarios:
+    get:
+      tags:
+        - Usuarios
+      summary: Lista todos os usuários
+      operationId: listarUsuarios
+      responses:
+        '200':
+          description: Lista de usuários
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: './usuarios.yaml#/components/schemas/Usuario'
+
+    post:
+      tags:
+        - Usuarios
+      summary: Cria um novo usuário
+      operationId: criarUsuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './usuarios.yaml#/components/schemas/UsuarioRequest'
+      responses:
+        '201':
+          description: Usuário criado
+          content:
+            application/json:
+              schema:
+                $ref: './usuarios.yaml#/components/schemas/Usuario'
+
+  /usuarios/{id}:
+    get:
+      tags:
+        - Usuarios
+      summary: Busca usuário por ID
+      operationId: buscarUsuarioPorId
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Usuário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: './usuarios.yaml#/components/schemas/Usuario'
+        '404':
+          description: Usuário não encontrado
+
+    put:
+      tags:
+        - Usuarios
+      summary: Atualiza um usuário
+      operationId: atualizarUsuario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './usuarios.yaml#/components/schemas/UsuarioRequest'
+      responses:
+        '200':
+          description: Usuário atualizado
+          content:
+            application/json:
+              schema:
+                $ref: './usuarios.yaml#/components/schemas/Usuario'
+
+    delete:
+      tags:
+        - Usuarios
+      summary: Remove um usuário
+      operationId: deletarUsuario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Usuário deletado com sucesso

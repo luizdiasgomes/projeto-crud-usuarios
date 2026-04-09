@@ -1,0 +1,12 @@
+
+services:
+
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: crud_usuario
+      POSTGRES_USER: crud_user
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5433:5432"
