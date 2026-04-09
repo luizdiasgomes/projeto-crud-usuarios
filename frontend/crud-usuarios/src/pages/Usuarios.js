@@ -4,40 +4,56 @@ import UsuarioList from "../components/UsuarioList";
 
 function Usuarios() {
     const [usuarioSelecionado, setUsuarioSelecionado] = useState(null);
+    const [mostrarForm, setMostrarForm] = useState(false);
     const [reload, setReload] = useState(false);
 
     const handleSave = () => {
         setUsuarioSelecionado(null);
+        setMostrarForm(false);
         setReload(!reload);
+    };
+
+    const handleEdit = (u) => {
+        setUsuarioSelecionado(u);
+        setMostrarForm(true);
+    };
+
+    const handleNovo = () => {
+        setUsuarioSelecionado(null);
+        setMostrarForm(true);
     };
 
     return (
         <div style={{
-            backgroundColor: "#121212",
-            color: "#E0E0E0",
+            backgroundColor: "#2B2D3C", // Fundo escuro das bordas da imagem
             minHeight: "100vh",
-            padding: "20px",
-            fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+            padding: "40px 20px",
+            fontFamily: "'Inter', 'Segoe UI', sans-serif",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "flex-start"
         }}>
-            <h1 style={{ textAlign: "center", marginBottom: "30px", color: "#BB86FC" }}>
-                CRUD de Usuários
-            </h1>
-
             <div style={{
-                display: "flex",
-                gap: "40px",
-                flexWrap: "wrap",
-                justifyContent: "center"
+                backgroundColor: "#FFFFFF",
+                borderRadius: "8px",
+                width: "100%",
+                maxWidth: "800px",
+                padding: "30px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
             }}>
-                <UsuarioForm
-                    usuarioSelecionado={usuarioSelecionado}
-                    onSave={handleSave}
-                />
-
-                <UsuarioList
-                    key={reload}
-                    onEdit={(u) => setUsuarioSelecionado(u)}
-                />
+                {!mostrarForm ? (
+                    <UsuarioList
+                        key={reload}
+                        onEdit={handleEdit}
+                        onNovo={handleNovo}
+                    />
+                ) : (
+                    <UsuarioForm
+                        usuarioSelecionado={usuarioSelecionado}
+                        onSave={handleSave}
+                        onCancel={() => setMostrarForm(false)}
+                    />
+                )}
             </div>
         </div>
     );
